@@ -890,28 +890,114 @@ const ResourceIcon = ({ type }) => {
   }
 };
 
-const MonthCard = ({ month }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-
+const MonthCard = ({ month, isOpen, toggle }) => {
   return (
     <motion.div
-      className="bg-white rounded-lg shadow-md p-4 mb-4 hover:shadow-lg transition-shadow duration-300"
-      initial={{ opacity: 0, y: 20 }}
+      layout
+      initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.3 }}
+      className="bg-white rounded-lg shadow-md overflow-hidden mb-4 hover:shadow-lg transition-shadow duration-300"
     >
-      <div 
-        className="flex justify-between items-center cursor-pointer" 
-        onClick={() => setIsExpanded(!isExpanded)}
+      <motion.header
+        className="p-4 cursor-pointer bg-gradient-to-r from-blue-50 to-purple-50 flex justify-between items-center"
+        onClick={toggle}
       >
         <h3 className="text-lg font-semibold">{month.name}: {month.topic}</h3>
         <motion.div
-          animate={{ rotate: isExpanded ? 180 : 0 }}
+          animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.3 }}
         >
           <ChevronDown />
         </motion.div>
-      </div>
+      </motion.header>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="p-4"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <h4 className="font-semibold mb-2 text-blue-600">Learning Objectives:</h4>
+                <ul className="list-disc pl-5 mb-4 space-y-1">
+                  {month.objectives.map((objective, index) => (
+                    <li key={index}>{objective}</li>
+                  ))}
+                </ul>
+                <h4 className="font-semibold mb-2 text-blue-600">Topics to Cover:</h4>
+                <ul className="list-disc pl-5 mb-4 space-y-1">
+                  {month.topics.map((topic, index) => (
+                    <li key={index}>{topic}</li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-2 text-blue-600">Resources:</h4>
+                <ul className="list-none pl-5 mb-4 space-y-2">
+                  {month.resources.map((resource, index) => (
+                    <li key={index} className="flex items-center">
+                      <ResourceIcon type={resource.type} />
+                      <span className="text-sm">{resource.name}</span>
+                    </li>
+                  ))}
+                </ul>
+                <h4 className="font-semibold mb-2 text-blue-600">Assignments:</h4>
+                <ul className="list-none pl-5 space-y-2">
+                  {month.assignments.map((assignment, index) => (
+                    <li key={index} className="flex items-center">
+                      <CheckSquare className="w-4 h-4 mr-2 text-green-500" />
+                      <span className="text-sm">{assignment}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+};
+
+const PhaseCard = ({ phase, index }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [openMonthIndex, setOpenMonthIndex] = useState(null);
+
+  const toggleMonth = (index) => {
+    setOpenMonthIndex(openMonthIndex === index ? null : index);
+  };
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+      className={`rounded-lg shadow-lg overflow-hidden mb-8 ${phase.color}`}
+    >
+      <motion.header
+        className="p-6 cursor-pointer bg-gradient-to-r from-white to-gray-50 flex justify-between items-center"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <div>
+          <h2 className="text-2xl font-bold">{phase.name}</h2>
+          <p className="text-gray-600 flex items-center mt-2">
+            <Calendar className="w-4 h-4 mr-2" />
+            {phase.duration}
+          </p>
+        </div>
+        <motion.div
+          animate={{ rotate: isExpanded ? 180 : 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <ChevronDown className="w-6 h-6" />
+        </motion.div>
+      </motion.header>
       <AnimatePresence>
         {isExpanded && (
           <motion.div
@@ -919,39 +1005,16 @@ const MonthCard = ({ month }) => {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
+            className="p-6"
           >
-            <div className="mt-4">
-              <h4 className="font-semibold mb-2">Learning Objectives:</h4>
-              <ul className="list-disc pl-5 mb-4">
-                {month.objectives.map((objective, index) => (
-                  <li key={index}>{objective}</li>
-                ))}
-              </ul>
-              <h4 className="font-semibold mb-2">Topics to Cover:</h4>
-              <ul className="list-disc pl-5 mb-4">
-                {month.topics.map((topic, index) => (
-                  <li key={index}>{topic}</li>
-                ))}
-              </ul>
-              <h4 className="font-semibold mb-2">Resources:</h4>
-              <ul className="list-none pl-5 mb-4">
-                {month.resources.map((resource, index) => (
-                  <li key={index} className="flex items-center mb-1">
-                    <ResourceIcon type={resource.type} />
-                    {resource.name}
-                  </li>
-                ))}
-              </ul>
-              <h4 className="font-semibold mb-2">Assignments:</h4>
-              <ul className="list-none pl-5">
-                {month.assignments.map((assignment, index) => (
-                  <li key={index} className="flex items-center mb-1">
-                    <CheckSquare className="w-4 h-4 mr-2" />
-                    {assignment}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {phase.months.map((month, monthIndex) => (
+              <MonthCard
+                key={monthIndex}
+                month={month}
+                isOpen={openMonthIndex === monthIndex}
+                toggle={() => toggleMonth(monthIndex)}
+              />
+            ))}
           </motion.div>
         )}
       </AnimatePresence>
