@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Book, Video, CheckSquare } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronDown, Book, Video, CheckSquare, Calendar } from 'lucide-react';
 
 const phases = [
   {
