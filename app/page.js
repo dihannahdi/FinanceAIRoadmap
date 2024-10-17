@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, Book, Video, CheckSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
